@@ -1,5 +1,5 @@
 ---
-title: "股票融資損益與追繳價格計算"
+title: "股票質押損益與追繳價格計算"
 author: "Joanna Liao"
 date: "`r format(Sys.time(), '%Y-%m-%d %H:%M:%S')`"
 output:
@@ -25,20 +25,20 @@ knitr::opts_chunk$set(
 ```{css, echo=FALSE}
 /* 全域字體設定 */
 body {
-  font-family: Arial, sans-serif;
+  font-family: "Noto Sans TC", "SFMono-Regular", Arial, sans-serif;
   font-size: 16px;
   line-height: 1.6;
 }
 
 /* 標題字體 */
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Noto Sans TC", Arial, sans-serif;
+  font-family: "Noto Sans TC", "SFMono-Regular", Arial, sans-serif;
   font-weight: bold;
 }
 
 /* 表格字體 */
 table {
-  font-family: "Noto Sans TC", monospace;
+  font-family: "Noto Sans TC", "Monaco", "Menlo", monospace;
   width: 100%;
   margin-bottom: 20px;
 }
@@ -52,7 +52,7 @@ table td {
 
 /* 程式碼區塊 */
 code {
-  font-family: "Consolas", "Monaco", "Courier New", monospace;
+  font-family: "Menlo", "Monaco", "Courier New", monospace;
   font-size: 14px;
 }
 ```
