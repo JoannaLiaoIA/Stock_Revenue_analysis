@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
 ```{css, echo=FALSE}
 /* 全域字體設定 */
 body {
-  font-family: "Noto Sans TC", Arial, sans-serif;
+  font-family: Arial, sans-serif;
   font-size: 16px;
   line-height: 1.6;
 }
@@ -142,7 +142,7 @@ df_result <- expand.grid(
   
     NI = Capital_gain + Div_gain - Fees - Interest,
   
-    Return = NI / Cost
+    Return = (NI / Cost) * 100
   ) %>%
 
   
@@ -152,6 +152,7 @@ df_result <- expand.grid(
 ```
 
 ### 損益計算結果 {.tabset .tabset-pills}
+選擇買進價格查看不同賣出價格下的損益計算結果
 ```{R, results = 'asis'}
 unique_buys <- sort(unique(df_result$Buy))
 
@@ -170,7 +171,7 @@ for (b in unique_buys) {
       `Div Gain` = fmt(Div_gain),
       Fees = fmt(Fees),
       NI = fmt(NI),
-      `Return(%)` = round(Return, 4)
+      `Return(%)` = round(Return, 2)
     ) %>%
     
     select(-Buy, -Return, -Capital_gain, -Div_gain) %>%
@@ -181,13 +182,13 @@ for (b in unique_buys) {
     
     cat("\n\n")
     cat(sprintf("#### %10s\n\n", fmt(b)))
-    cat("\n* 買進價格：", fmt(b))
-    cat("\n* Break Even Price:", break_even_price)
+    cat("\n* **買進價格：", fmt(b), "**\n")
+    cat("\n* **Break Even Price:", break_even_price, "**\n")
     cat("\n\n")
     
-    table_output <- knitr::kable(df_show, align = "r", format = "html") %>%
+    table_output <- knitr::kable(df_show, align = "c", format = "html") %>%
         kable_styling(
-            bootstrap_options = c("striped", "hover", "condensed")
+            bootstrap_options = c("striped", "hover")
         )
   
     cat(as.character(table_output))
@@ -203,24 +204,24 @@ rm(df_show, b, unique_buys, table_output)
 
 ### 條件設定
 ```{R}
-cat("\n* 借款成數：", loan_ratio * 100, "%")
-cat("\n* 維持率：", margin_rate * 100, "%")
-cat("\n* 追繳維持率：", required_rate * 100, "%")
-cat("\n* 買進價格區間：", fmt(min(buy_price)), "元 ~", fmt(max(buy_price)), "元")
+cat(paste0("\n借款成數：", loan_ratio * 100, "%"))
+cat(paste0("\n維持率：", margin_rate * 100, "%"))
+cat(paste0("\n追繳維持率：", required_rate * 100, "%"))
+cat(paste0("\n買進價格區間：", fmt(min(buy_price)), "~", fmt(max(buy_price)), " 元"))
 ```
 
 ### 計算結果 {.tabset .tabset-pills}
-```{R, results = 'asis'}
+選擇不同擔保品總價值，查看對應的可用融資額度、保證金追繳價格、依價格可購買張數及預期張數最高價格
+```{R, results = 'asis', echo = TRUE}
 value_guarantee_range <- seq(from = 5.5e6, to = 1.5e7, by = 5e5)
 
 for (value in value_guarantee_range) {
   loan_fund <- value * loan_ratio
   
-  
+  cat("\n\n")
   cat(sprintf("#### %20s\n\n", fmt(value)))
-
-  cat("\n**擔保品總價值：**", fmt(value), "元\n")
-  cat("\n**可用融資額度：**", fmt(loan_fund), "元\n")
+  cat("\n* **擔保品總價值：", fmt(value), "元**\n")
+  cat("\n* **可用融資額度：", fmt(loan_fund), "元**\n")
   
   # === 表格 1: 保證金追繳試算 ===
   df_margin <- data.frame(
