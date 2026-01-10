@@ -3,13 +3,13 @@ title: "股票融資損益與追繳價格計算"
 author: "Joanna Liao"
 date: "`r format(Sys.time(), '%Y-%m-%d %H:%M:%S')`"
 output:
-  html_document:
+  html_document: 
     toc: true
-    toc_depth: 2
     toc_float: true
+    df_print: kable
   pdf_document: 
     toc: true
-    toc_depth: 2
+    toc_depth: 3
     latex_engine: xelatex
 ---
 
@@ -18,17 +18,49 @@ knitr::opts_chunk$set(
   results = 'hold',
   warning = FALSE,
   message = FALSE,
-  echo = TRUE
+  echo = FALSE
 )
 ```
 
+```{css, echo=FALSE}
+/* 全域字體設定 */
+body {
+  font-family: "Noto Sans TC", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
 
-## [Latest Version](https://joannaliaoia.github.io/Stock_Revenue_analysis/)
+/* 標題字體 */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Noto Sans TC", Arial, sans-serif;
+  font-weight: bold;
+}
 
+/* 表格字體 */
+table {
+  font-family: "Noto Sans TC", monospace;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+/* 表格內容 */
+table td {
+  padding: 8px;
+  text-align: right;
+  border-bottom: 1px solid #ddd;
+}
+
+/* 程式碼區塊 */
+code {
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
+  font-size: 14px;
+}
+```
+> [Latest Version On Webiste](https://joannaliaoia.github.io/Stock_Revenue_analysis/)
 
 ## 安裝需要的套件
 ```{R}
-required_packages <- c("tidyverse", "knitr")
+required_packages <- c("tidyverse", "knitr", "kableExtra")
 
 installed_packages <- rownames(installed.packages())
 
@@ -50,24 +82,25 @@ loan_days <- 180
 
 current_price <- 1680         # 目前收盤價格
 target_price <- 2200          # 目標賣出價格
-stock_amount_extra <- 4       # 想要買的股票數量
-stock_amount_guarantee <- seq(from = 3, to = 6)   # 抵押的股票數量
+stock_extra <- 4              # 想要買的股票數量
+stock_guarantee <- seq(from = 3, to = 6)   # 抵押的股票數量
 
 dividend_per_share <- 5
 
 fee_rate <- 0.003
 tax_rate <- 0.001425
 
-my_capital <- 1e7           # 擔保品的總價值
-required_rate <- 1.660      # 要求維持率
+value_guarantee <- 1e7  # 擔保品的總價值
+available_capital <- value_guarantee * loan_ratio  # 可用資金
+required_rate <- 1.660  # 要求維持率
 margin_rate <- 1.3
 ```
 
 ## 函數定義
-* `fmt`: 管理數字輸出的格式
-* `calc_breakeven_price`: 計算損益兩平價格 -> 多少錢賣出不會賠錢
+* `fmt`：管理數字輸出的格式
+* `calc_breakeven_price`：計算損益兩平價格 -> 多少錢賣出不會賠錢
     * 假設沒有股利
-    * 利息以單利計算，已考慮天數
+    * 利息單利計算，已考慮天數
 ```{R, Function Definitions, echo = TRUE}
 options(scipen = 999)  # 關掉科學記號
 
@@ -78,18 +111,19 @@ fmt <- function(x) {
 calc_breakeven_price <- function(buy_price) {
   breakeven_price <-
     buy_price * (1 + fee_rate + (loan_interest_rate * loan_days/365)) / (1 + fee_rate)
+  
   return(breakeven_price)
 }
 ```
 
 ## 計算損益金額和簡單報酬率
-* `Buy_price`: 買進價格，以 1/9（五）的收盤價 1680 抓區間，10 元一個區間
-    * 目前價格的 90% 到 110%
-* `Sell_price`: 賣出價格，以目前價格到目標價格，每 50 元一個區間
-```{R}
+* `buy_price`：買進價格，以 1/9（五）的收盤價 1680 的 90%~110% 抓區間，每 10 元一個區間
+* `sell_price`：賣出價格，以目前價格到目標價格，每 10 元一個區間
+* `loan_fund`：根據資金和借款成數計算出借款金額
+```{R, echo = TRUE}
 buy_price <- sort(seq(from = current_price * 0.9, to = current_price * 1.1, by = 10), decreasing = FALSE)
-sell_price <- sort(seq(from = current_price, to = target_price, by = 50), decreasing = FALSE)
-loan_amount <- my_capital * loan_ratio
+sell_price <- sort(seq(from = current_price, to = target_price, by = 10), decreasing = FALSE)
+loan_fund <- value_guarantee * loan_ratio
 
 df_result <- expand.grid(
   Buy = buy_price,
@@ -97,19 +131,16 @@ df_result <- expand.grid(
   ) %>%
   
   mutate(
-    Cost = Buy * stock_amount_extra * 1000,
+    Cost = Buy * stock_extra * 1000,
   
-    Capital_gain = Sell * stock_amount_extra * 1000,
-    Div_gain = dividend_per_share * stock_amount_extra * 1000,
+    Capital_gain = (Sell - Buy) * stock_extra * 1000,
+    Div_gain = dividend_per_share * stock_extra * 1000,
   
-    Fees =
-      Cost * fee_rate +
-      Capital_gain * fee_rate +
-      Capital_gain * tax_rate,
+    Fees = Cost * fee_rate + Capital_gain * fee_rate + Capital_gain * tax_rate,
   
-    Interest = loan_amount * loan_interest_rate * (loan_days / 365),
+    Interest = loan_fund * loan_interest_rate * (loan_days / 365),
   
-    NI = Capital_gain + Div_gain - Cost - Fees - Interest,
+    NI = Capital_gain + Div_gain - Fees - Interest,
   
     Return = NI / Cost
   ) %>%
@@ -118,8 +149,10 @@ df_result <- expand.grid(
   relocate(Buy, Sell, Cost, Interest, Capital_gain, Div_gain, Fees, NI, Return) %>%
   
   filter(Return >= 0)   # 只顯示有賺錢的組合
+```
 
-# 輸出用
+### 損益計算結果 {.tabset .tabset-pills}
+```{R, results = 'asis'}
 unique_buys <- sort(unique(df_result$Buy))
 
 for (b in unique_buys) {
@@ -142,76 +175,128 @@ for (b in unique_buys) {
     
     select(-Buy, -Return, -Capital_gain, -Div_gain) %>%
     
-    relocate(Sell, Cost, Interest, `Capital Gain`, `Div Gain`, Fees, NI, `Return(%)`)
+    relocate(Sell, Cost, `Capital Gain`, `Div Gain`, Fees, Interest, NI, `Return(%)`)
   
     break_even_price <- fmt(calc_breakeven_price(b))
+    
+    cat("\n\n")
+    cat(sprintf("#### %10s\n\n", fmt(b)))
+    cat("\n* 買進價格：", fmt(b))
+    cat("\n* Break Even Price:", break_even_price)
+    cat("\n\n")
+    
+    table_output <- knitr::kable(df_show, align = "r", format = "html") %>%
+        kable_styling(
+            bootstrap_options = c("striped", "hover", "condensed")
+        )
   
-    print(knitr::kable(
-      df_show,
-      align = "r",
-      caption = paste("\n買入價格:", b, "\nBreak Even Price: ", break_even_price)
-  ))
+    cat(as.character(table_output))
+    cat("\n\n")
 }
 
-rm(df_show, df_result, b, unique_buys)
+rm(df_show, b, unique_buys, table_output)
 ```
+### {-}
+
 
 ## 計算不同借款金額的追繳價格
+
+### 條件設定
 ```{R}
-my_capital <- seq(from = 5.5*10^6, to = 1.5*10^7, by = 5*10^5)
+cat("\n* 借款成數：", loan_ratio * 100, "%")
+cat("\n* 維持率：", margin_rate * 100, "%")
+cat("\n* 追繳維持率：", required_rate * 100, "%")
+cat("\n* 買進價格區間：", fmt(min(buy_price)), "元 ~", fmt(max(buy_price)), "元")
+```
 
-# 輸出價格
-cat("\n--------------------------------------------------\n")
-cat("假設條件：\n")
-cat("借款成數:", loan_ratio * 100, "%\n")
-cat("維持率:", margin_rate * 100, "%\n")
-cat("追繳維持率:", required_rate * 100, "%\n")
-cat("買進價格區間:", fmt(min(buy_price)), "元 ~", fmt(max(buy_price)), "元\n")
-cat("--------------------------------------------------\n\n")
+### 計算結果 {.tabset .tabset-pills}
+```{R, results = 'asis'}
+value_guarantee_range <- seq(from = 5.5e6, to = 1.5e7, by = 5e5)
 
-for (capital in my_capital) {
-  loan_amount <- capital * loan_ratio
+for (value in value_guarantee_range) {
+  loan_fund <- value * loan_ratio
   
-  cat("總共資金：", fmt(capital), "\n")
-  cat("可用金額：", fmt(loan_amount), "\n")
-
-  # 計算追繳價格
-  for(stock_amount in stock_amount_guarantee) {
-    cat("\n抵押張數:", stock_amount, "\n")
-    margin_call_price <- (margin_rate * loan_amount) / (stock_amount * 1000)
-    margin_at_call <- (required_rate * loan_amount - margin_call_price * stock_amount * 1000) / margin_rate
-    
-    cat("追繳價格:", round(margin_call_price, 2), "\n")
-    cat("需要補繳:", fmt(margin_at_call), "\n")
-  }
   
-  min_stock_amount <- floor(loan_amount / (max(buy_price) * 1000))
-  max_stock_amount <- floor(loan_amount / (min(buy_price) * 1000))
+  cat(sprintf("#### %20s\n\n", fmt(value)))
+
+  cat("\n**擔保品總價值：**", fmt(value), "元\n")
+  cat("\n**可用融資額度：**", fmt(loan_fund), "元\n")
+  
+  # === 表格 1: 保證金追繳試算 ===
+  df_margin <- data.frame(
+    stock_guarantee = stock_guarantee
+  ) %>%
+    mutate(
+      margin_call_price = (margin_rate * loan_fund) / (stock_guarantee * 1000),
+      required_deposit = (required_rate * loan_fund 
+                          - margin_call_price * stock_guarantee * 1000) / margin_rate
+    ) %>%
+    mutate(
+      margin_call_price = fmt(margin_call_price),
+      required_deposit = fmt(required_deposit)
+    )
+  
+  cat("\n 保證金追繳試算表：\n\n")
+  table_output <- knitr::kable(df_margin, align = "c", format = "html") %>%
+      kable_styling(
+          bootstrap_options = c("striped", "hover")
+          )
+  
+  cat(as.character(table_output))
+  cat("\n\n")
+  
+  # === 表格 2: 依價格可購買張數 ===
+  min_stock_amount <- floor(loan_fund / (max(buy_price) * 1000))
+  max_stock_amount <- floor(loan_fund / (min(buy_price) * 1000))
   stock_amount_range <- seq(from = min_stock_amount, to = max_stock_amount)
-  price_at_amt <- loan_amount / (stock_amount_range * 1000)
+  price_at_amt <- loan_fund / (stock_amount_range * 1000)
   
+  df_buyable <- data.frame(
+    stock_amount = stock_amount_range
+  ) %>%
+    mutate(
+      price_lower = c(price_at_amt[-1], min(buy_price)),
+      price_upper = price_at_amt,
+      price_range = paste0(fmt(price_lower), " ~ ", fmt(price_upper))
+    ) %>%
+    select(stock_amount, price_range)
+  
+  cat("\n 依價格可購買張數：\n\n")
+  table_output <- knitr::kable(df_buyable, align = "c", format = "html") %>%
+      kable_styling(
+          bootstrap_options = c("striped", "hover")
+          ) %>%
+      column_spec(1, width = "50%") %>%
+      column_spec(2, width = "50%")
+  
+  cat(as.character(table_output))
   cat("\n\n")
-  for (i in seq_along(stock_amount_range)) {
   
-    upper <- price_at_amt[i]
-    lower <- if (i < length(price_at_amt)) price_at_amt[i + 1] else min(buy_price)
-  
-      cat(fmt(lower), "< 價格 ≤", fmt(upper),
-          "可以買", stock_amount_range[i], "張\n")
-    
-  }
-
-  
-  cat("\n\n")
-  
-  # 可以買到預期數量的最高價
+  # === 表格 3: 預期張數最高價格 ===
   stock_amount_expect <- seq(from = 4, to = 6)
   
-  for (expect in stock_amount_expect) {
-    max_buy_price <- (capital - loan_amount) / (expect * 1000)
-    cat("想買", expect, "張，可以買到的最高價格：", fmt(max_buy_price), "元\n")
-  }
+  df_max_price <- data.frame(
+    stock_amount = stock_amount_expect
+  ) %>%
+    mutate(
+      highest_buy_price = (value - loan_fund) / (stock_amount * 1000)
+    ) %>%
+    mutate(
+      highest_buy_price = fmt(highest_buy_price)
+    )
   
-cat("\n--------------------------------------------------\n\n")
+  cat("\n 預期張數最高價格：\n\n")
+  table_output <- knitr::kable(df_max_price, align = "c", format = "html") %>%
+      kable_styling(
+          bootstrap_options = c("striped", "hover")
+          ) %>%
+      column_spec(1, width = "50%") %>%
+      column_spec(2, width = "50%")
+  
+  cat(as.character(table_output))
+  cat("\n\n")
+  
+  cat("---\n\n")
 }
 ```
+### {-}
