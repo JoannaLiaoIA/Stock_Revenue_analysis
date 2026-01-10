@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 ```
 
 
-* **[latest version](https://joannaliaoia.github.io/Stock_Revenue_analysis/#安裝需要的套件)**
+## [Latest Version](https://joannaliaoia.github.io/Stock_Revenue_analysis/)
 
 
 ## 安裝需要的套件
