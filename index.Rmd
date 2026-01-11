@@ -7,6 +7,7 @@ output:
     toc: true
     toc_float: true
     df_print: kable
+    css: styles.css
   pdf_document: 
     toc: true
     toc_depth: 3
@@ -22,40 +23,40 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{css, echo=FALSE}
-/* 全域字體設定 */
-body {
-  font-family: "Noto Sans TC", "SFMono-Regular", Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
-}
+<!-- ```{css, echo=FALSE} -->
+<!-- /* 全域字體設定 */ -->
+<!-- body { -->
+<!--   font-family: "Noto Sans TC", "SFMono-Regular", Arial, sans-serif; -->
+<!--   font-size: 16px; -->
+<!--   line-height: 1.6; -->
+<!-- } -->
 
-/* 標題字體 */
-h1, h2, h3, h4, h5, h6 {
-  font-family: "Noto Sans TC", "SFMono-Regular", Arial, sans-serif;
-  font-weight: bold;
-}
+<!-- /* 標題字體 */ -->
+<!-- h1, h2, h3, h4, h5, h6 { -->
+<!--   font-family: "Noto Sans TC", "SFMono-Regular", Arial, sans-serif; -->
+<!--   font-weight: bold; -->
+<!-- } -->
 
-/* 表格字體 */
-table {
-  font-family: "Noto Sans TC", "Courier New", "SFMono-Regular", Arial, monospace;
-  width: 100%;
-  margin-bottom: 20px;
-}
+<!-- /* 表格字體 */ -->
+<!-- table { -->
+<!--   font-family: "Noto Sans TC", "SFMono-Regular", Arial, monospace; -->
+<!--   width: 100%; -->
+<!--   margin-bottom: 20px; -->
+<!-- } -->
 
-/* 表格內容 */
-table td {
-  padding: 8px;
-  text-align: right;
-  border-bottom: 1px solid #ddd;
-}
+<!-- /* 表格內容 */ -->
+<!-- table td { -->
+<!--   padding: 8px; -->
+<!--   text-align: right; -->
+<!--   border-bottom: 1px solid #ddd; -->
+<!-- } -->
 
-/* 程式碼區塊 */
-code {
-  font-family: "Menlo", "Monaco", "Courier New", monospace;
-  font-size: 14px;
-}
-```
+<!-- /* 程式碼區塊 */ -->
+<!-- code { -->
+<!--   font-family: "Menlo", "Monaco", "Courier New", monospace; -->
+<!--   font-size: 14px; -->
+<!-- } -->
+<!-- ``` -->
 > [Latest Version On Webiste](https://joannaliaoia.github.io/Stock_Revenue_analysis/)
 
 ## 安裝需要的套件
