@@ -8,10 +8,6 @@ output:
     toc_float: true
     df_print: kable
     css: styles.css
-  pdf_document: 
-    toc: true
-    toc_depth: 3
-    latex_engine: xelatex
 ---
 
 ```{R setup, include = FALSE}
@@ -22,45 +18,21 @@ knitr::opts_chunk$set(
   echo = FALSE
 )
 ```
-
-<!-- ```{css, echo=FALSE} -->
-<!-- /* 全域字體設定 */ -->
-<!-- body { -->
-<!--   font-family: "Noto Sans TC", "SFMono-Regular", Arial, sans-serif; -->
-<!--   font-size: 16px; -->
-<!--   line-height: 1.6; -->
-<!-- } -->
-
-<!-- /* 標題字體 */ -->
-<!-- h1, h2, h3, h4, h5, h6 { -->
-<!--   font-family: "Noto Sans TC", "SFMono-Regular", Arial, sans-serif; -->
-<!--   font-weight: bold; -->
-<!-- } -->
-
-<!-- /* 表格字體 */ -->
-<!-- table { -->
-<!--   font-family: "Noto Sans TC", "SFMono-Regular", Arial, monospace; -->
-<!--   width: 100%; -->
-<!--   margin-bottom: 20px; -->
-<!-- } -->
-
-<!-- /* 表格內容 */ -->
-<!-- table td { -->
-<!--   padding: 8px; -->
-<!--   text-align: right; -->
-<!--   border-bottom: 1px solid #ddd; -->
-<!-- } -->
-
-<!-- /* 程式碼區塊 */ -->
-<!-- code { -->
-<!--   font-family: "Menlo", "Monaco", "Courier New", monospace; -->
-<!--   font-size: 14px; -->
-<!-- } -->
-<!-- ``` -->
 > [Latest Version On Webiste](https://joannaliaoia.github.io/Stock_Revenue_analysis/)
 
+## 更新內容
+* 2026.01.08 建立基本雛形。
+* 2026.01.10 更新 break-even price 計算方式、放到 github pages。
+* 2026.01.12 修正「計算損益金額和簡單報酬率」的篩選條件，改成大於無風險利率才顯示。
+
+## 背景
+* 質押股票：台積電（2330）
+* 標的股票：台積電（2330）
+* 無風險利率：以[台銀一年期定存利率](https://rate.bot.com.tw/twd?Lang=zh-TW)為判斷標準
+
 ## 安裝需要的套件
-```{R}
+* 略
+```{R load packages}
 required_packages <- c("tidyverse", "knitr", "kableExtra")
 
 installed_packages <- rownames(installed.packages())
@@ -76,7 +48,7 @@ rm(required_packages, installed_packages, pkg)
 ```
 
 ## 參數設定
-```{R, echo = TRUE}
+```{R set parameters, echo = TRUE}
 loan_ratio <- 0.6
 loan_interest_rate <- 0.0248
 loan_days <- 180
@@ -95,6 +67,8 @@ value_guarantee <- 1e7  # 擔保品的總價值
 available_capital <- value_guarantee * loan_ratio  # 可用資金
 required_rate <- 1.660  # 要求維持率
 margin_rate <- 1.3
+
+risk_free_rate <- 0.0170  # 無風險利率
 ```
 
 ## 函數定義
@@ -102,7 +76,7 @@ margin_rate <- 1.3
 * `calc_breakeven_price`：計算損益兩平價格 -> 多少錢賣出不會賠錢
     * 假設沒有股利
     * 利息單利計算，已考慮天數
-```{R, Function Definitions, echo = TRUE}
+```{R define functions, echo = TRUE}
 options(scipen = 999)  # 關掉科學記號
 
 fmt <- function(x) {
@@ -121,7 +95,8 @@ calc_breakeven_price <- function(buy_price) {
 * `buy_price`：買進價格，以 1/9（五）的收盤價 1680 的 90%~110% 抓區間，每 10 元一個區間
 * `sell_price`：賣出價格，以目前價格到目標價格，每 10 元一個區間
 * `loan_fund`：根據資金和借款成數計算出借款金額
-```{R, echo = TRUE}
+
+```{R cal return and rate of return , echo = TRUE}
 buy_price <- sort(seq(from = current_price * 0.9, to = current_price * 1.1, by = 10), decreasing = FALSE)
 sell_price <- sort(seq(from = current_price, to = target_price, by = 10), decreasing = FALSE)
 loan_fund <- value_guarantee * loan_ratio
@@ -149,12 +124,12 @@ df_result <- expand.grid(
   
   relocate(Buy, Sell, Cost, Interest, Capital_gain, Div_gain, Fees, NI, Return) %>%
   
-  filter(Return >= 0)   # 只顯示有賺錢的組合
+  filter(Return >= (risk_free_rate * 100))   # 只顯示有賺錢的組合
 ```
 
 ### 損益計算結果 {.tabset .tabset-pills}
 選擇買進價格查看不同賣出價格下的損益計算結果
-```{R, results = 'asis'}
+```{R cal return on different price buying, results = 'asis'}
 unique_buys <- sort(unique(df_result$Buy))
 
 for (b in unique_buys) {
@@ -204,14 +179,16 @@ rm(df_show, b, unique_buys, table_output)
 ## 計算不同借款金額的追繳價格
 
 ### 條件設定
-```{R}
-cat(paste0("\n借款成數：", loan_ratio * 100, "%"))
-cat(paste0("\n維持率：", margin_rate * 100, "%"))
-cat(paste0("\n追繳維持率：", required_rate * 100, "%"))
-cat(paste0("\n買進價格區間：", fmt(min(buy_price)), "~", fmt(max(buy_price)), " 元"))
+```{R set margin parameter}
+knitr::asis_output(paste0(
+  "* 借款成數：", loan_ratio * 100, "%  \n",
+  "* 維持率：", margin_rate * 100, "%  \n",
+  "* 追繳維持率：", required_rate * 100, "%  \n",
+  "* 買進價格區間：", fmt(min(buy_price)), " ~ ", fmt(max(buy_price)), " 元"
+))
 ```
 
-### 計算結果 {.tabset .tabset-pills}
+### 計算結果 {.tabset .tabset-pills .tabset-fade}
 選擇不同擔保品總價值，查看對應的可用融資額度、保證金追繳價格、依價格可購買張數及預期張數最高價格
 ```{R, results = 'asis', echo = TRUE}
 value_guarantee_range <- seq(from = 5.5e6, to = 1.5e7, by = 5e5)

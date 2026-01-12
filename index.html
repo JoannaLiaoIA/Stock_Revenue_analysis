@@ -1524,47 +1524,37 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">股票質押損益與追繳價格計算</h1>
 <h4 class="author">Joanna Liao</h4>
-<h4 class="date">2026-01-11 12:07:04</h4>
+<h4 class="date">2026-01-12 11:01:35</h4>
 
 </div>
 
 
-<!-- ```{css, echo=FALSE} -->
-<!-- /* 全域字體設定 */ -->
-<!-- body { -->
-<!--   font-family: "Noto Sans TC", "SFMono-Regular", Arial, sans-serif; -->
-<!--   font-size: 16px; -->
-<!--   line-height: 1.6; -->
-<!-- } -->
-<!-- /* 標題字體 */ -->
-<!-- h1, h2, h3, h4, h5, h6 { -->
-<!--   font-family: "Noto Sans TC", "SFMono-Regular", Arial, sans-serif; -->
-<!--   font-weight: bold; -->
-<!-- } -->
-<!-- /* 表格字體 */ -->
-<!-- table { -->
-<!--   font-family: "Noto Sans TC", "SFMono-Regular", Arial, monospace; -->
-<!--   width: 100%; -->
-<!--   margin-bottom: 20px; -->
-<!-- } -->
-<!-- /* 表格內容 */ -->
-<!-- table td { -->
-<!--   padding: 8px; -->
-<!--   text-align: right; -->
-<!--   border-bottom: 1px solid #ddd; -->
-<!-- } -->
-<!-- /* 程式碼區塊 */ -->
-<!-- code { -->
-<!--   font-family: "Menlo", "Monaco", "Courier New", monospace; -->
-<!--   font-size: 14px; -->
-<!-- } -->
-<!-- ``` -->
 <blockquote>
 <p><a href="https://joannaliaoia.github.io/Stock_Revenue_analysis/">Latest
 Version On Webiste</a></p>
 </blockquote>
+<div id="更新內容" class="section level2">
+<h2>更新內容</h2>
+<ul>
+<li>2026.01.08 建立基本雛形。</li>
+<li>2026.01.10 更新 break-even price 計算方式、放到 github pages。</li>
+<li>2026.01.12
+修正「計算損益金額和簡單報酬率」的篩選條件，改成大於無風險利率才顯示。</li>
+</ul>
+</div>
+<div id="背景" class="section level2">
+<h2>背景</h2>
+<ul>
+<li>質押股票：台積電（2330）</li>
+<li>標的股票：台積電（2330）</li>
+<li>無風險利率：以<a href="https://rate.bot.com.tw/twd?Lang=zh-TW">台銀一年期定存利率</a>為判斷標準</li>
+</ul>
+</div>
 <div id="安裝需要的套件" class="section level2">
 <h2>安裝需要的套件</h2>
+<ul>
+<li>略</li>
+</ul>
 </div>
 <div id="參數設定" class="section level2">
 <h2>參數設定</h2>
@@ -1585,7 +1575,9 @@ tax_rate &lt;- 0.001425
 value_guarantee &lt;- 1e7  # 擔保品的總價值
 available_capital &lt;- value_guarantee * loan_ratio  # 可用資金
 required_rate &lt;- 1.660  # 要求維持率
-margin_rate &lt;- 1.3</code></pre>
+margin_rate &lt;- 1.3
+
+risk_free_rate &lt;- 0.0170  # 無風險利率</code></pre>
 </div>
 <div id="函數定義" class="section level2">
 <h2>函數定義</h2>
@@ -1647,7 +1639,7 @@ df_result &lt;- expand.grid(
   
   relocate(Buy, Sell, Cost, Interest, Capital_gain, Div_gain, Fees, NI, Return) %&gt;%
   
-  filter(Return &gt;= 0)   # 只顯示有賺錢的組合</code></pre>
+  filter(Return &gt;= (risk_free_rate * 100))   # 只顯示有賺錢的組合</code></pre>
 <div id="損益計算結果" class="section level3 tabset tabset-pills">
 <h3 class="tabset tabset-pills">損益計算結果</h3>
 <p>選擇買進價格查看不同賣出價格下的損益計算結果</p>
@@ -20110,32 +20102,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,680.00
-</td>
-<td style="text-align:center;">
-6,568,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-20,376.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-78,242.58
-</td>
-<td style="text-align:center;">
-1.19
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,690.00
 </td>
 <td style="text-align:center;">
@@ -21527,58 +21493,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,680.00
-</td>
-<td style="text-align:center;">
-6,608,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-20,319.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-38,299.58
-</td>
-<td style="text-align:center;">
-0.58
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,690.00
-</td>
-<td style="text-align:center;">
-6,608,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-20,496.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-78,122.58
-</td>
-<td style="text-align:center;">
-1.18
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,700.00
 </td>
 <td style="text-align:center;">
@@ -22944,58 +22858,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,690.00
-</td>
-<td style="text-align:center;">
-6,648,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-20,439.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-38,179.58
-</td>
-<td style="text-align:center;">
-0.57
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,700.00
-</td>
-<td style="text-align:center;">
-6,648,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-20,616.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-78,002.58
-</td>
-<td style="text-align:center;">
-1.17
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,710.00
 </td>
 <td style="text-align:center;">
@@ -24335,58 +24197,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,700.00
-</td>
-<td style="text-align:center;">
-6,688,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-20,559.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-38,059.58
-</td>
-<td style="text-align:center;">
-0.57
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,710.00
-</td>
-<td style="text-align:center;">
-6,688,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-20,736.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-77,882.58
-</td>
-<td style="text-align:center;">
-1.16
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,720.00
 </td>
 <td style="text-align:center;">
@@ -25700,58 +25510,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,710.00
-</td>
-<td style="text-align:center;">
-6,728,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-20,679.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-37,939.58
-</td>
-<td style="text-align:center;">
-0.56
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,720.00
-</td>
-<td style="text-align:center;">
-6,728,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-20,856.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-77,762.58
-</td>
-<td style="text-align:center;">
-1.16
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,730.00
 </td>
 <td style="text-align:center;">
@@ -27039,58 +26797,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,720.00
-</td>
-<td style="text-align:center;">
-6,768,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-20,799.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-37,819.58
-</td>
-<td style="text-align:center;">
-0.56
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,730.00
-</td>
-<td style="text-align:center;">
-6,768,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-20,976.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-77,642.58
-</td>
-<td style="text-align:center;">
-1.15
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,740.00
 </td>
 <td style="text-align:center;">
@@ -28352,58 +28058,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,730.00
-</td>
-<td style="text-align:center;">
-6,808,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-20,919.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-37,699.58
-</td>
-<td style="text-align:center;">
-0.55
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,740.00
-</td>
-<td style="text-align:center;">
-6,808,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,096.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-77,522.58
-</td>
-<td style="text-align:center;">
-1.14
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,750.00
 </td>
 <td style="text-align:center;">
@@ -29639,58 +29293,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,740.00
-</td>
-<td style="text-align:center;">
-6,848,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,039.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-37,579.58
-</td>
-<td style="text-align:center;">
-0.55
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,750.00
-</td>
-<td style="text-align:center;">
-6,848,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,216.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-77,402.58
-</td>
-<td style="text-align:center;">
-1.13
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,760.00
 </td>
 <td style="text-align:center;">
@@ -30900,58 +30502,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,750.00
-</td>
-<td style="text-align:center;">
-6,888,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,159.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-37,459.58
-</td>
-<td style="text-align:center;">
-0.54
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,760.00
-</td>
-<td style="text-align:center;">
-6,888,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,336.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-77,282.58
-</td>
-<td style="text-align:center;">
-1.12
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,770.00
 </td>
 <td style="text-align:center;">
@@ -32135,84 +31685,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,760.00
-</td>
-<td style="text-align:center;">
-6,928,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,279.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-37,339.58
-</td>
-<td style="text-align:center;">
-0.54
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,770.00
-</td>
-<td style="text-align:center;">
-6,928,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,456.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-77,162.58
-</td>
-<td style="text-align:center;">
-1.11
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,780.00
-</td>
-<td style="text-align:center;">
-6,928,000.00
-</td>
-<td style="text-align:center;">
-192,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,633.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-116,985.58
-</td>
-<td style="text-align:center;">
-1.69
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,790.00
 </td>
 <td style="text-align:center;">
@@ -33344,84 +32816,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,770.00
-</td>
-<td style="text-align:center;">
-6,968,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,399.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-37,219.58
-</td>
-<td style="text-align:center;">
-0.53
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,780.00
-</td>
-<td style="text-align:center;">
-6,968,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,576.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-77,042.58
-</td>
-<td style="text-align:center;">
-1.11
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,790.00
-</td>
-<td style="text-align:center;">
-6,968,000.00
-</td>
-<td style="text-align:center;">
-192,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,753.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-116,865.58
-</td>
-<td style="text-align:center;">
-1.68
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,800.00
 </td>
 <td style="text-align:center;">
@@ -34527,84 +33921,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,780.00
-</td>
-<td style="text-align:center;">
-7,008,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,519.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-37,099.58
-</td>
-<td style="text-align:center;">
-0.53
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,790.00
-</td>
-<td style="text-align:center;">
-7,008,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,696.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-76,922.58
-</td>
-<td style="text-align:center;">
-1.10
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,800.00
-</td>
-<td style="text-align:center;">
-7,008,000.00
-</td>
-<td style="text-align:center;">
-192,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,873.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-116,745.58
-</td>
-<td style="text-align:center;">
-1.67
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,810.00
 </td>
 <td style="text-align:center;">
@@ -35684,84 +35000,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,790.00
-</td>
-<td style="text-align:center;">
-7,048,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,639.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-36,979.58
-</td>
-<td style="text-align:center;">
-0.52
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,800.00
-</td>
-<td style="text-align:center;">
-7,048,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,816.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-76,802.58
-</td>
-<td style="text-align:center;">
-1.09
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,810.00
-</td>
-<td style="text-align:center;">
-7,048,000.00
-</td>
-<td style="text-align:center;">
-192,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,993.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-116,625.58
-</td>
-<td style="text-align:center;">
-1.65
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,820.00
 </td>
 <td style="text-align:center;">
@@ -36815,84 +36053,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,800.00
-</td>
-<td style="text-align:center;">
-7,088,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,759.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-36,859.58
-</td>
-<td style="text-align:center;">
-0.52
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,810.00
-</td>
-<td style="text-align:center;">
-7,088,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,936.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-76,682.58
-</td>
-<td style="text-align:center;">
-1.08
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,820.00
-</td>
-<td style="text-align:center;">
-7,088,000.00
-</td>
-<td style="text-align:center;">
-192,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,113.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-116,505.58
-</td>
-<td style="text-align:center;">
-1.64
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,830.00
 </td>
 <td style="text-align:center;">
@@ -37920,84 +37080,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,810.00
-</td>
-<td style="text-align:center;">
-7,128,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,879.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-36,739.58
-</td>
-<td style="text-align:center;">
-0.52
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,820.00
-</td>
-<td style="text-align:center;">
-7,128,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,056.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-76,562.58
-</td>
-<td style="text-align:center;">
-1.07
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,830.00
-</td>
-<td style="text-align:center;">
-7,128,000.00
-</td>
-<td style="text-align:center;">
-192,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,233.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-116,385.58
-</td>
-<td style="text-align:center;">
-1.63
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,840.00
 </td>
 <td style="text-align:center;">
@@ -38999,84 +38081,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,820.00
-</td>
-<td style="text-align:center;">
-7,168,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-21,999.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-36,619.58
-</td>
-<td style="text-align:center;">
-0.51
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,830.00
-</td>
-<td style="text-align:center;">
-7,168,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,176.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-76,442.58
-</td>
-<td style="text-align:center;">
-1.07
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,840.00
-</td>
-<td style="text-align:center;">
-7,168,000.00
-</td>
-<td style="text-align:center;">
-192,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,353.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-116,265.58
-</td>
-<td style="text-align:center;">
-1.62
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,850.00
 </td>
 <td style="text-align:center;">
@@ -40052,84 +39056,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,830.00
-</td>
-<td style="text-align:center;">
-7,208,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,119.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-36,499.58
-</td>
-<td style="text-align:center;">
-0.51
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,840.00
-</td>
-<td style="text-align:center;">
-7,208,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,296.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-76,322.58
-</td>
-<td style="text-align:center;">
-1.06
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,850.00
-</td>
-<td style="text-align:center;">
-7,208,000.00
-</td>
-<td style="text-align:center;">
-192,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,473.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-116,145.58
-</td>
-<td style="text-align:center;">
-1.61
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,860.00
 </td>
 <td style="text-align:center;">
@@ -41079,84 +40005,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,840.00
-</td>
-<td style="text-align:center;">
-7,248,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,239.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-36,379.58
-</td>
-<td style="text-align:center;">
-0.50
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,850.00
-</td>
-<td style="text-align:center;">
-7,248,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,416.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-76,202.58
-</td>
-<td style="text-align:center;">
-1.05
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,860.00
-</td>
-<td style="text-align:center;">
-7,248,000.00
-</td>
-<td style="text-align:center;">
-192,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,593.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-116,025.58
-</td>
-<td style="text-align:center;">
-1.60
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,870.00
 </td>
 <td style="text-align:center;">
@@ -42080,84 +40928,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,850.00
-</td>
-<td style="text-align:center;">
-7,288,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,359.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-36,259.58
-</td>
-<td style="text-align:center;">
-0.50
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,860.00
-</td>
-<td style="text-align:center;">
-7,288,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,536.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-76,082.58
-</td>
-<td style="text-align:center;">
-1.04
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,870.00
-</td>
-<td style="text-align:center;">
-7,288,000.00
-</td>
-<td style="text-align:center;">
-192,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,713.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-115,905.58
-</td>
-<td style="text-align:center;">
-1.59
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,880.00
 </td>
 <td style="text-align:center;">
@@ -43055,84 +41825,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,860.00
-</td>
-<td style="text-align:center;">
-7,328,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,479.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-36,139.58
-</td>
-<td style="text-align:center;">
-0.49
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,870.00
-</td>
-<td style="text-align:center;">
-7,328,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,656.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-75,962.58
-</td>
-<td style="text-align:center;">
-1.04
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,880.00
-</td>
-<td style="text-align:center;">
-7,328,000.00
-</td>
-<td style="text-align:center;">
-192,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,833.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-115,785.58
-</td>
-<td style="text-align:center;">
-1.58
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,890.00
 </td>
 <td style="text-align:center;">
@@ -44004,84 +42696,6 @@ Return(%)
 <tbody>
 <tr>
 <td style="text-align:center;">
-1,870.00
-</td>
-<td style="text-align:center;">
-7,368,000.00
-</td>
-<td style="text-align:center;">
-112,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,599.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-36,019.58
-</td>
-<td style="text-align:center;">
-0.49
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,880.00
-</td>
-<td style="text-align:center;">
-7,368,000.00
-</td>
-<td style="text-align:center;">
-152,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,776.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-75,842.58
-</td>
-<td style="text-align:center;">
-1.03
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
-1,890.00
-</td>
-<td style="text-align:center;">
-7,368,000.00
-</td>
-<td style="text-align:center;">
-192,000.00
-</td>
-<td style="text-align:center;">
-20,000.00
-</td>
-<td style="text-align:center;">
-22,953.60
-</td>
-<td style="text-align:center;">
-73,380.82
-</td>
-<td style="text-align:center;">
-115,665.58
-</td>
-<td style="text-align:center;">
-1.57
-</td>
-</tr>
-<tr>
-<td style="text-align:center;">
 1,900.00
 </td>
 <td style="text-align:center;">
@@ -44898,14 +43512,18 @@ Return(%)
 <h2>計算不同借款金額的追繳價格</h2>
 <div id="條件設定" class="section level3">
 <h3>條件設定</h3>
-<pre><code>## 
-## 借款成數：60%
-## 維持率：130%
-## 追繳維持率：166%
-## 買進價格區間：1,512.00~1,842.00 元</code></pre>
+<ul>
+<li>借款成數：60%<br />
+</li>
+<li>維持率：130%<br />
+</li>
+<li>追繳維持率：166%<br />
+</li>
+<li>買進價格區間：1,512.00 ~ 1,842.00 元</li>
+</ul>
 </div>
-<div id="計算結果" class="section level3 tabset tabset-pills">
-<h3 class="tabset tabset-pills">計算結果</h3>
+<div id="計算結果" class="section level3 tabset tabset-pills tabset-fade">
+<h3 class="tabset tabset-pills tabset-fade">計算結果</h3>
 <p>選擇不同擔保品總價值，查看對應的可用融資額度、保證金追繳價格、依價格可購買張數及預期張數最高價格</p>
 <pre class="r"><code>value_guarantee_range &lt;- seq(from = 5.5e6, to = 1.5e7, by = 5e5)
 
