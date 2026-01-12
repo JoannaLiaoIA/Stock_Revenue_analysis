@@ -20,18 +20,13 @@ knitr::opts_chunk$set(
 ```
 > [Latest Version On Webiste](https://joannaliaoia.github.io/Stock_Revenue_analysis/)
 
-## 更新內容
-* 2026.01.08 建立基本雛形。
-* 2026.01.10 更新 break-even price 計算方式、放到 github pages。
-* 2026.01.12 修正「計算損益金額和簡單報酬率」的篩選條件，改成大於無風險利率才顯示。
-
 ## 背景
 * 質押股票：台積電（2330）
 * 標的股票：台積電（2330）
 * 無風險利率：以[台銀一年期定存利率](https://rate.bot.com.tw/twd?Lang=zh-TW)為判斷標準
 
 ## 安裝需要的套件
-* 略
+略
 ```{R load packages}
 required_packages <- c("tidyverse", "knitr", "kableExtra")
 
@@ -279,3 +274,8 @@ for (value in value_guarantee_range) {
 }
 ```
 ### {-}
+
+## 更新內容
+* 2026.01.08 建立基本雛形。
+* 2026.01.10 更新 break-even price 計算方式、放到 github pages。
+* 2026.01.12 修正「計算損益金額和簡單報酬率」的篩選條件，改成大於無風險利率才顯示。
